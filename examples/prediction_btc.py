@@ -9,13 +9,16 @@ from model import Kronos, KronosTokenizer, KronosPredictor
 
 OUTPUT_DIR = '../outputs'
 SYMBOL = 'BTCUSDT'
-LOOKBACK = 400
-PRED_LEN = 24
+# usage: python prediction_btc.py [interval=1h] [lookback=400] [pred_len=24]
+INTERVAL = sys.argv[1] if len(sys.argv) > 1 else '1h'
+LOOKBACK = int(sys.argv[2]) if len(sys.argv) > 2 else 400
+PRED_LEN = int(sys.argv[3]) if len(sys.argv) > 3 else 24
+PREFIX = f'btc_{INTERVAL}'
 
 
-def fetch_klines(symbol, limit):
-    # Last `limit` closed 1h candles (the still-open candle is dropped)
-    url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval=1h&limit={limit + 1}"
+def fetch_klines(symbol, interval, limit):
+    # Last `limit` closed candles (the still-open candle is dropped)
+    url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit + 1}"
     with urllib.request.urlopen(url, timeout=30) as r:
         rows = json.load(r)[:-1]
     df = pd.DataFrame(rows).iloc[:, :8]
@@ -29,8 +32,8 @@ def fetch_klines(symbol, limit):
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 1. Data: LOOKBACK candles as context + PRED_LEN candles as ground truth
-df = fetch_klines(SYMBOL, LOOKBACK + PRED_LEN)
-df.to_csv(os.path.join(OUTPUT_DIR, 'btc_1h_input.csv'), index=False)
+df = fetch_klines(SYMBOL, INTERVAL, LOOKBACK + PRED_LEN)
+df.to_csv(os.path.join(OUTPUT_DIR, f'{PREFIX}_input.csv'), index=False)
 
 # 2. Model (CPU)
 tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
@@ -53,7 +56,7 @@ pred_df = predictor.predict(
     sample_count=1,
     verbose=True
 )
-pred_df.to_csv(os.path.join(OUTPUT_DIR, 'btc_1h_predictions.csv'), index_label='timestamps')
+pred_df.to_csv(os.path.join(OUTPUT_DIR, f'{PREFIX}_predictions.csv'), index_label='timestamps')
 print(pred_df.head())
 
 # 4. Plot (last 100 context candles + ground truth vs prediction)
@@ -73,4 +76,4 @@ ax2.set_ylabel('Volume (BTC)')
 ax2.grid(True)
 fig.autofmt_xdate()
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, 'btc_1h_prediction.png'), dpi=150)
+plt.savefig(os.path.join(OUTPUT_DIR, f'{PREFIX}_prediction.png'), dpi=150)
