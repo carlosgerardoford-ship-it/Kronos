@@ -1,0 +1,117 @@
+INFORME: PRIMERA CORRIDA DE VALIDACION (9 ACTIVOS, 1 HORA)
+==========================================================
+Repo: carlosgerardoford-ship-it/Kronos (fork de shiyu-coder/Kronos), rama setup-cpu
+Datos hasta: 18-oct-2026. Esto evalua una herramienta; no es asesoramiento de inversion.
+
+
+1. CONCLUSION
+-------------
+Con 20 ventanas por activo, ningun activo paso el filtro fijado de antemano. El modelo (Kronos-small, sin ajuste fino)
+tuvo un error en precio peor que el baseline "el precio se queda igual" en los 9 activos, y la direccion quedo
+cerca del 50% salvo dos casos que parecian buenos (QQQ 75% y BTCUSDT 70%). Esos dos casos se repitieron luego con
+mas ventanas (ver seccion 6) y desaparecieron: eran azar.
+
+
+2. QUE SE EVALUO Y COMO
+-----------------------
+Entorno: sesion en la nube, solo CPU (4 hilos), Python 3.12.3, torch 2.14.1+cpu.
+Modelo: Kronos-small + Kronos-Tokenizer-base (Hugging Face), sin ajuste fino, T=1.0, top_p=0.9, 1 muestra.
+Script: examples/validate.py
+
+Comando:
+  python validate.py KO TLT MCD COST SPY QQQ PLTR BTCUSDT ETHUSDT --interval 1h --lookback 400 --pred-len 24 \
+         --samples 1 --windows 20 --null-test
+
+Datos
+  - BTCUSDT y ETHUSDT: Binance spot (data-api.binance.vision), velas cerradas.
+  - Acciones/ETF (KO, TLT, MCD, COST, SPY, QQQ, PLTR): Yahoo Finance, hora de Nueva York, velas cerradas con volumen > 0.
+    Yahoo no entrega "amount": se aproxima como cierre x volumen.
+
+Metodo: backtest walk-forward (NO es un pronostico hacia adelante)
+  - Por activo, 20 ventanas consecutivas. En cada una el modelo ve 400 velas de 1h (unos 17 dias en cripto) y predice
+    las siguientes 24 velas, que YA OCURRIERON; se compara con lo real.
+  - La parte real de las ventanas no se solapa; cada ventana solo ve velas anteriores (sin fuga de datos).
+  - Semilla por ventana = semilla + indice de ventana (reproducible).
+
+Metricas
+  - Direccion: acierta si el cierre final predicho y el real quedan del mismo lado del ultimo cierre del contexto.
+    Se reporta el % de aciertos con margen de error 95% (intervalo de Wilson) y la "base": el % que se lograria
+    apostando siempre al lado que mas ocurrio.
+  - Error absoluto medio del cierre contra el baseline "se queda igual" (ultimo cierre del contexto), y en cuantas
+    ventanas el modelo le gana.
+  - Desfase: ver seccion 5.
+
+Criterio de aprobacion (fijado de antemano)
+  Un activo pasa solo si (a) le gana al baseline en MAS de la mitad de las ventanas y (b) su % de aciertos supera la
+  base, con el limite inferior del IC 95% por encima de 50%. Si ninguno pasa, no se prueban mas activos ni
+  temporalidades (evita buscar suerte).
+
+
+3. RESULTADOS (1h, 400 velas de contexto, 24 a predecir, 20 ventanas por activo)
+--------------------------------------------------------------------------------
+  Activo    Aciertos      IC 95%   Base   Error medio  Baseline  Gana al baseline
+  KO        9/20  (45%)   26-66%   60%    2.08         1.11      2/20
+  TLT       7/20  (35%)   18-57%   60%    1.03         0.48      2/20
+  MCD       8/20  (40%)   22-61%   55%    6.10         2.75      3/20
+  COST      9/20  (45%)   26-66%   55%    14.48        9.62      5/20
+  SPY       11/20 (55%)   34-74%   55%    8.74         4.81      3/20
+  QQQ       15/20 (75%)   53-89%   60%    11.37        9.12      10/20
+  PLTR      10/20 (50%)   30-70%   60%    11.01        5.58      4/20
+  BTCUSDT   14/20 (70%)   48-85%   60%    613.11       551.22    8/20
+  ETHUSDT   6/20  (30%)   15-52%   55%    40.20        24.07     3/20
+
+  Periodo de las ventanas (fin del contexto): acciones/ETF del 13-jul al 13-oct-2026 (KO y QQQ desde el 10-jul);
+  BTCUSDT y ETHUSDT del 29-sep al 18-oct-2026.
+
+
+4. FILTRO DE APROBACION
+-----------------------
+  Ningun activo pasa.
+  - QQQ: cumple la parte de direccion (75% contra base de 60%, limite inferior 53%), pero le gana al baseline en
+    10 de 20 ventanas y el criterio pide mas de la mitad.
+  - BTCUSDT: 70% (limite inferior 48%, no supera 50%) y le gana al baseline en solo 8 de 20.
+  - Los otros 7: direccion entre 30% y 55%, y le ganan al baseline en 2 a 5 de 20 ventanas.
+  Multiples comparaciones: con 9 activos y 20 ventanas, la probabilidad de que al menos uno saque 15 o mas aciertos
+  por puro azar es ~17% (por activo, ~2%). Por eso no se tomo el 75% de QQQ como evidencia.
+  Por la regla fijada, no se hizo confirmacion fuera de muestra con estos activos ni se probaron otros.
+
+
+5. SOBRE EL DESFASE (ADELANTO / RETRASO)
+----------------------------------------
+- La primera medida (mejor desfase por error absoluto, busqueda de +-8 velas) dio un desfase medio de 6 a 7.5
+  velas y mayoria de "adelantado" en casi todos los activos. La prueba "sin habilidad" mostro que era un artefacto:
+  emparejando cada prediccion con el real de OTRA ventana (pares sin relacion) se obtuvo el mismo resultado.
+  Ejemplos (desfase absoluto, pares correctos contra sin relacion): KO 6.6 vs 6.5, TLT 7.3 vs 7.2, COST 6.7 vs 6.6,
+  PLTR 7.5 vs 7.0, ETHUSDT 6.0 vs 6.6. El mejor ajuste caia en el borde de la busqueda en 50-80% de los casos.
+  Esas lineas de los resumenes ("Desfase absoluto medio", "Error alineando por desfase") no son confiables.
+- Medida corregida (examples/analyze_lag.py): correlacion de cambios vela a vela, pares correctos contra pares
+  sin relacion:
+    BTCUSDT -0.020 vs -0.021 | COST +0.090 vs +0.002 | ETHUSDT -0.063 vs -0.020 | KO -0.009 vs +0.018
+    MCD +0.121 vs -0.006     | PLTR +0.006 vs -0.012 | QQQ +0.055 vs +0.005     | SPY -0.087 vs -0.008
+    TLT +0.014 vs +0.005
+  Son valores chicos (entre -0.09 y +0.12), compatibles con ruido para 20 ventanas por activo (error tipico ~0.045):
+  no se detecta que el modelo adelante ni llegue tarde.
+
+
+6. QUE PASO DESPUES CON LOS DOS "MEJORES" CASOS
+-----------------------------------------------
+  Se repitieron QQQ y BTCUSDT en 1h con mas ventanas (criterios fijados antes, outputs/validation_long/PREREGISTRO.md):
+    BTCUSDT, 200 ventanas: 107/200 = 54% (IC 47-60%), base 55%, gana al baseline en 60/200 -> no pasa.
+    QQQ, 126 ventanas:     61/126 = 48% (IC 40-57%), base 63%, gana al baseline en 27/126 -> no pasa.
+  Con 5 muestras promediadas (60 ventanas): BTCUSDT 53% y QQQ 50%. Tampoco pasan.
+  Con 5 minutos (400 contexto / 120 a predecir): BTCUSDT 48/100 y QQQ 21/35. Tampoco pasan.
+
+
+7. LIMITACIONES
+---------------
+- 20 ventanas por activo: el margen de error de direccion es de +-20 puntos; sirve para descartar, no para confirmar.
+- Solo Kronos-small sin ajuste fino; no se probaron Kronos-base/mini ni finetune/ (excluido por pedido).
+- Solo 1h, 1 muestra. Esta corrida no incluye la medida de volatilidad (se agrego despues, en las corridas largas).
+- Los datos son en vivo: repetir la corrida no dara numeros identicos.
+
+
+8. DONDE ESTA TODO (rama setup-cpu)
+-----------------------------------
+  outputs/validation/summary_1h.txt   resumen de texto completo (9 activos, con la prueba sin habilidad)
+  outputs/validation/<ACTIVO>_1h.csv  una fila por ventana, con las trayectorias predicha y real
+  outputs/validation/lag_corrected.txt  desfase corregido
