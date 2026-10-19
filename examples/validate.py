@@ -253,6 +253,45 @@ def format_null(ticker, rows, pred_len):
     ])
 
 
+# ---------------------------------------------------------------- volatility
+
+def vol_metrics(ctx_tail, pred, truth):
+    """Range (high-low) and close-to-close volatility of the predicted/real window and of the last context
+    window (the naive "same volatility as before" baseline), all as a fraction of the last context close."""
+    last = float(ctx_tail["close"].iloc[-1])
+    rng = lambda d: (float(d["high"].max()) - float(d["low"].min())) / last
+    vol = lambda c: float(np.std(np.diff(np.asarray(c, dtype=float)))) / last
+    ctx_prev = ctx_tail.iloc[1:]  # last P candles of the context
+    return {"pred_range": rng(pred), "real_range": rng(truth), "ctx_range": rng(ctx_prev),
+            "pred_vol": vol(np.concatenate([[last], pred["close"]])),
+            "real_vol": vol(np.concatenate([[last], truth["close"]])), "ctx_vol": vol(ctx_tail["close"])}
+
+
+def vol_stats(rows):
+    out = {}
+    for key in ("range", "vol"):
+        pr, rr, cr = (np.maximum(np.array([r[f"{k}_{key}"] for r in rows]), 1e-9) for k in ("pred", "real", "ctx"))
+        sp = lambda x, y: float(np.corrcoef(pd.Series(x).rank(), pd.Series(y).rank())[0, 1])  # Spearman, no scipy
+        out[key] = {"corr_model": sp(pr, rr), "corr_base": sp(cr, rr),
+                    "err_model": float(np.median(np.abs(np.log(pr / rr)))),
+                    "err_base": float(np.median(np.abs(np.log(cr / rr)))),
+                    "ratio": float(np.median(pr / rr)), "n": len(rows)}
+    return out
+
+
+def format_vol(ticker, rows):
+    s = vol_stats(rows)
+    names = {"range": "Rango (máx-mín) de la ventana", "vol": "Volatilidad (desv. de cambios de cierre)"}
+    lines = [f"{ticker} · volatilidad ({s['range']['n']} ventanas; baseline = misma volatilidad que en el contexto)"]
+    for key in ("range", "vol"):
+        x = s[key]
+        lines += [f"{names[key]}",
+                  f"  Correlación (Spearman) con el real:  modelo {x['corr_model']:+.2f} | baseline {x['corr_base']:+.2f}",
+                  f"  Error log mediano |ln(pred/real)|:   modelo {x['err_model']:.2f} | baseline {x['err_base']:.2f}",
+                  f"  Mediana predicho/real: {x['ratio']:.2f}"]
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------- walk-forward
 
 _predictor = None
@@ -269,7 +308,7 @@ def get_predictor():
     return _predictor
 
 
-def run_ticker(ticker, args):
+def run_ticker(ticker, args, checkpoint=None):
     import torch
     df = load_candles(ticker, args.interval, args.lookback, args.pred_len, args.windows, args.offset)
     predictor = get_predictor()
@@ -289,13 +328,16 @@ def run_ticker(ticker, args):
         real_path = truth["close"].to_numpy(dtype=float)
         m = window_metrics(float(ctx["close"].iloc[-1]), pred_path, real_path, P)
         m.update(window=i, ctx_end=ctx["timestamps"].iloc[-1], pred_path=pred_path, real_path=real_path)
+        m.update(vol_metrics(ctx.tail(P + 1), pred, truth))
         rows.append(m)
+        if checkpoint and (i + 1) % 10 == 0:
+            save_csv(checkpoint, rows)
     return rows
 
 
 def save_csv(path, rows):
     cols = ["window", "ctx_end", "last_close", "pred_end", "real_end", "hit", "real_up", "mae", "mae_baseline",
-            "lag", "mae_at_lag"]
+            "lag", "mae_at_lag", "pred_range", "real_range", "ctx_range", "pred_vol", "real_vol", "ctx_vol"]
     out = pd.DataFrame([{c: r[c] for c in cols} for r in rows])
     out["close_pred"] = [";".join(f"{v:.6g}" for v in r["pred_path"]) for r in rows]
     out["close_real"] = [";".join(f"{v:.6g}" for v in r["real_path"]) for r in rows]
@@ -331,7 +373,7 @@ def main(argv=None):
     for ticker in args.tickers:
         name = ticker.upper().replace("/", "")
         try:
-            rows = run_ticker(ticker, args)
+            rows = run_ticker(ticker, args, os.path.join(args.out, f"{name}_{tag}.csv"))
         except Exception as e:
             print(f"{name}: ERROR: {e}", flush=True)
             entries.append((name, None, str(e)))
@@ -339,6 +381,7 @@ def main(argv=None):
         s = ticker_stats(rows)
         periods = (rows[0]["ctx_end"].strftime("%Y-%m-%d %H:%M"), rows[-1]["ctx_end"].strftime("%Y-%m-%d %H:%M"))
         text = format_summary(name, args.interval, args.pred_len, args.samples, periods, s)
+        text += "\n\n" + format_vol(name, rows)
         if args.null_test:
             text += "\n\n" + format_null(name, rows, args.pred_len)
         print("\n" + text + "\n", flush=True)

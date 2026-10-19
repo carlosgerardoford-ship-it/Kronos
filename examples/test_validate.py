@@ -36,6 +36,23 @@ def test_best_lag_corr():
         assert got == k and c > 0.8, (k, got, c)
 
 
+def test_vol_stats():
+    rng = np.random.default_rng(7)
+    real = rng.uniform(0.01, 0.05, 30)
+    rows = [{"pred_range": r * 1.1, "real_range": r, "ctx_range": rng.uniform(0.01, 0.05),
+             "pred_vol": r * 0.9, "real_vol": r, "ctx_vol": rng.uniform(0.01, 0.05)} for r in real]
+    s = v.vol_stats(rows)
+    assert s["range"]["corr_model"] > 0.99 and abs(s["range"]["corr_base"]) < 0.6
+    assert s["range"]["err_model"] < s["range"]["err_base"] and abs(s["range"]["ratio"] - 1.1) < 1e-9
+    assert "volatilidad" in v.format_vol("X", rows)
+    ctx = pd.DataFrame({"high": [11, 12, 13], "low": [9, 8, 10], "close": [10, 11, 12]})
+    truth = pd.DataFrame({"high": [14, 15], "low": [11, 12], "close": [13, 14]})
+    pred = pd.DataFrame({"high": [13, 14], "low": [11, 11], "close": [12, 13]})
+    m = v.vol_metrics(ctx, pred, truth)
+    assert abs(m["real_range"] - (15 - 11) / 12) < 1e-12 and abs(m["pred_range"] - (14 - 11) / 12) < 1e-12
+    assert abs(m["ctx_range"] - (13 - 8) / 12) < 1e-12
+
+
 def test_wilson():
     lo, hi = v.wilson_interval(8, 20)
     assert round(lo * 100) == 22 and round(hi * 100) == 61, (lo, hi)
