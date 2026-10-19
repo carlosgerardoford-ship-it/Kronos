@@ -1,0 +1,130 @@
+INFORME: VALIDACION DE KRONOS-SMALL EN BTCUSDT Y QQQ (1h Y 5m)
+==============================================================
+Repo: carlosgerardoford-ship-it/Kronos (fork de shiyu-coder/Kronos), rama setup-cpu
+Datos hasta: 19-oct-2026. Esto evalua una herramienta; no es asesoramiento de inversion.
+
+
+1. CONCLUSION
+-------------
+En los dos analisis (1h y 5m), Kronos-small sin ajuste fino NO mostro ventaja medible sobre el baseline "el precio
+se queda igual": ni en direccion, ni en volatilidad, ni en adelanto/retraso. Ningun resultado cumplio los criterios
+fijados de antemano. Su error en precio fue peor que el del baseline en todas las corridas.
+
+
+2. QUE SE EVALUO Y COMO
+-----------------------
+Entorno: sesion en la nube, solo CPU (4 hilos), Python 3.12.3, torch 2.14.1+cpu.
+Modelo: Kronos-small + Kronos-Tokenizer-base (Hugging Face), sin ajuste fino, T=1.0, top_p=0.9.
+Script: examples/validate.py (tests sin modelo en examples/test_validate.py; README en examples/VALIDATE.md).
+
+Datos
+  - BTCUSDT: Binance spot (data-api.binance.vision), velas cerradas.
+  - QQQ: Yahoo Finance (query1.finance.yahoo.com), hora de Nueva York, velas cerradas con volumen > 0.
+    Yahoo no entrega "amount" (turnover): se aproxima como cierre x volumen.
+
+Metodo: backtest walk-forward (NO es un pronostico hacia adelante)
+  - Se arman ventanas consecutivas. En cada una el modelo ve 400 velas de contexto y predice las siguientes N velas,
+    que YA OCURRIERON, y se compara con lo real.
+  - La parte real de las ventanas no se solapa; cada ventana solo ve velas anteriores (sin fuga de datos).
+  - Semilla por ventana = semilla + indice de ventana (reproducible).
+
+Metricas
+  - Direccion: acierta si el cierre final predicho y el real quedan del mismo lado del ultimo cierre del contexto.
+    Se reporta % de aciertos con margen de error 95% (intervalo de Wilson) y la "base": el % que se lograria apostando
+    siempre al lado que mas ocurrio.
+  - Error absoluto medio del cierre contra el baseline "se queda igual" (ultimo cierre del contexto), y en
+    cuantas ventanas el modelo le gana.
+  - Volatilidad: rango (maximo-minimo) y desviacion de los cambios de cierre; correlacion (Spearman) y error log
+    mediano del modelo contra el baseline "misma volatilidad que en las ultimas N velas del contexto".
+  - Desfase (adelanta o llega tarde): correlacion de los cambios vela a vela, comparando pares correctos contra
+    pares sin relacion (ver seccion 5).
+
+Criterios fijados ANTES de ver cada corrida (outputs/validation_long/PREREGISTRO.md y outputs/validation_5m/PREREGISTRO.md)
+  - Direccion: pasa solo si (a) le gana al baseline en MAS de la mitad de las ventanas y (b) su % de aciertos supera la
+    base, con el limite inferior del IC 95% por encima de 50%.
+  - Volatilidad: util solo si su correlacion con el rango real supera a la del baseline Y su error log mediano es menor.
+  - Si no pasa, no se prueban mas activos ni temporalidades (evita buscar suerte).
+
+
+3. ANALISIS 1: TEMPORALIDAD DE 1 HORA (400 velas de contexto, 24 a predecir = 24 horas)
+--------------------------------------------------------------------------------------
+  Corrida                      Aciertos            IC 95%   Base  Error medio  Baseline  Gana al baseline
+  BTCUSDT, 200 vent., 1 muestra   107/200 = 54%    47-60%   55%   1074         692       60/200
+  QQQ, 126 vent., 1 muestra        61/126 = 48%    40-57%   63%   13.86        7.40      27/126
+  BTCUSDT, 60 vent., 5 muestras    32/60  = 53%    41-65%   50%   1226         645       21/60
+  QQQ, 60 vent., 5 muestras        30/60  = 50%    38-62%   57%   13.48        8.35      21/60
+
+  Periodos: BTC 2-abr a 18-oct (200 vent.); QQQ 17-ene-2025 a 13-oct-2026 (126 vent., el maximo que da Yahoo en 1h).
+  Volatilidad (correlacion con el rango real, modelo contra baseline / error log mediano modelo contra baseline):
+    BTC 1 muestra:  +0.22 / +0.27   0.53 / 0.42
+    QQQ 1 muestra:  +0.08 / +0.41   0.41 / 0.34
+    BTC 5 muestras: +0.33 / +0.17   0.54 / 0.51   (mejor correlacion, pero peor error: no cumple las dos)
+    QQQ 5 muestras: +0.10 / +0.29   0.53 / 0.31
+  Resultado: no pasa direccion ni volatilidad.
+  Nota: en una corrida previa mas chica (20 ventanas, 9 activos) QQQ habia sacado 15/20 = 75%; con 126 ventanas
+  bajo a 48%. Era azar (con 9 activos, la chance de que alguno saque 15 o mas por azar es ~17%).
+
+
+4. ANALISIS 2: TEMPORALIDAD DE 5 MINUTOS (400 velas de contexto, 120 a predecir = 10 horas; la del ejemplo del repo)
+-------------------------------------------------------------------------------------------------------------------
+  Corrida                      Aciertos            IC 95%   Base  Error medio  Baseline  Gana al baseline
+  BTCUSDT, 100 vent., 1 muestra    48/100 = 48%    38-58%   53%   877          420       19/100
+  QQQ, 35 vent., 1 muestra         21/35  = 60%    44-74%   54%   10.41        4.75      8/35
+
+  Periodos: BTC 8-sep a 19-oct; QQQ 3-ago a 16-oct (35 ventanas es el maximo que da Yahoo para 5m).
+  QQQ supera la base, pero con 35 ventanas el margen de error es enorme (limite inferior 44%): no se distingue del azar.
+  Volatilidad (rango; correlacion modelo / baseline; error log modelo / baseline):
+    BTC: +0.24 / +0.29   0.47 / 0.47
+    QQQ: +0.02 / +0.04   0.53 / 0.35
+  Resultado: no pasa direccion ni volatilidad.
+
+
+5. SOBRE EL DESFASE (ADELANTO / RETRASO)
+----------------------------------------
+- La primera medida (mejor desfase por error absoluto) resulto un artefacto: con pares de ventanas sin relacion dio
+  el mismo desfase que con los pares correctos, y el mejor ajuste caia en el borde de la busqueda con mucha
+  frecuencia. Las lineas "Desfase absoluto medio" y "Error alineando por desfase" de los resumenes no son confiables.
+- Medida corregida (examples/analyze_lag.py), correlacion de cambios vela a vela en desfase 0, pares correctos
+  contra pares sin relacion:
+    1h:  BTC -0.001 vs +0.002 | QQQ -0.062 vs +0.001   (5 muestras: BTC +0.013 vs +0.002 | QQQ -0.041 vs -0.002)
+    5m:  BTC -0.018 vs +0.001 | QQQ +0.061 vs +0.002
+  Son ~0 y no se distinguen de los pares sin relacion: no se detecta que el modelo adelante ni llegue tarde.
+
+
+6. LECTURA
+----------
+- La direccion queda cerca del 50%, dentro del ruido estadistico. Con 20 ventanas el margen de error es de +-20 puntos;
+  con 100-200, de +-7 a +-10.
+- El modelo genera trayectorias con mas movimiento que el real; por eso su error en precio es mayor que el de
+  "se queda igual" en todas las corridas.
+- Como estimador de volatilidad tampoco mejora al baseline simple.
+
+
+7. LIMITACIONES
+---------------
+- Solo Kronos-small sin ajuste fino; no se probaron Kronos-base/mini ni finetune/ (excluido por pedido).
+- Solo dos activos y dos temporalidades (1h y 5m). No se validaron 15m, 4h ni 1d.
+- 1 muestra en la mayoria de las corridas (se probo con 5 solo en 1h).
+- QQQ en 5m: solo 35 ventanas disponibles; poca potencia estadistica.
+- Los datos son en vivo: repetir las corridas no dara numeros identicos.
+- Otros activos, periodos o ajuste fino podrian dar otros resultados; no se evaluaron.
+
+
+8. COMO REPRODUCIR
+------------------
+  cd examples
+  python validate.py BTCUSDT --interval 1h --windows 200
+  python validate.py QQQ --interval 1h --windows 126
+  python validate.py BTCUSDT QQQ --interval 1h --windows 60 --samples 5
+  python validate.py BTCUSDT --interval 5m --lookback 400 --pred-len 120 --windows 100
+  python validate.py QQQ --interval 5m --lookback 400 --pred-len 120 --windows 35
+  python analyze_lag.py ../outputs/validation_5m 120        # desfase corregido (usar 24 para las de 1h)
+  python test_validate.py                                    # tests sin modelo
+
+
+9. DONDE ESTA TODO (rama setup-cpu)
+-----------------------------------
+  outputs/validation_long/      BTCUSDT y QQQ, 1h, 1 muestra (+ PREREGISTRO.md)
+  outputs/validation_samples5/  BTCUSDT y QQQ, 1h, 5 muestras
+  outputs/validation_5m/        BTCUSDT y QQQ, 5m (+ PREREGISTRO.md)
+  Cada carpeta: un CSV por activo (una fila por ventana, con las trayectorias), el resumen en texto y lag_corrected.txt.
