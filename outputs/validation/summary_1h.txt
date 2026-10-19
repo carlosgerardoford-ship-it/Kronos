@@ -1,0 +1,191 @@
+KO · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-10 15:30 → 2026-10-13 12:30
+Dirección acertada:   9 de 20 (45%)
+  Margen de error 95%: 26% a 66%
+  El precio subió en 12 de 20 ventanas; siempre apostar a la más frecuente acertaría 60%
+Error abs. medio:     2.08
+Baseline "se queda igual": 1.11
+Le gana al baseline:  2 de 20 ventanas
+Desfase absoluto medio: 6.6 velas (sin importar el signo)
+  Signo medio: -0.9   mediana: -2.5
+  Tarde: 9   Adelantado: 10   Sin desfase: 1
+  Error alineando por desfase: 1.62 (contra 2.08 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+KO · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 6.6 | adelantado 50% | tarde 45% | sin desfase 5% | en el borde 60%
+  Pares sin relación ( 380): abs 6.5 | adelantado 67% | tarde 31% | sin desfase 3% | en el borde 62%
+  → distintos: el emparejamiento correcto se comporta distinto al azar
+
+TLT · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-13 11:30 → 2026-10-13 12:30
+Dirección acertada:   7 de 20 (35%)
+  Margen de error 95%: 18% a 57%
+  El precio subió en 8 de 20 ventanas; siempre apostar a la más frecuente acertaría 60%
+Error abs. medio:     1.03
+Baseline "se queda igual": 0.48
+Le gana al baseline:  2 de 20 ventanas
+Desfase absoluto medio: 7.3 velas (sin importar el signo)
+  Signo medio: -3.5   mediana: -8
+  Tarde: 6   Adelantado: 14   Sin desfase: 0
+  Error alineando por desfase: 0.70 (contra 1.03 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+TLT · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 7.3 | adelantado 70% | tarde 30% | sin desfase 0% | en el borde 80%
+  Pares sin relación ( 380): abs 7.2 | adelantado 74% | tarde 25% | sin desfase 1% | en el borde 79%
+  → parecidos: el desfase medido es probablemente un artefacto de la medida
+
+MCD · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-13 11:30 → 2026-10-13 12:30
+Dirección acertada:   8 de 20 (40%)
+  Margen de error 95%: 22% a 61%
+  El precio subió en 9 de 20 ventanas; siempre apostar a la más frecuente acertaría 55%
+Error abs. medio:     6.10
+Baseline "se queda igual": 2.75
+Le gana al baseline:  3 de 20 ventanas
+Desfase absoluto medio: 6.2 velas (sin importar el signo)
+  Signo medio: -2.5   mediana: -7.5
+  Tarde: 6   Adelantado: 11   Sin desfase: 3
+  Error alineando por desfase: 4.47 (contra 6.10 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+MCD · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 6.2 | adelantado 55% | tarde 30% | sin desfase 15% | en el borde 65%
+  Pares sin relación ( 380): abs 7.1 | adelantado 70% | tarde 29% | sin desfase 1% | en el borde 73%
+  → distintos: el emparejamiento correcto se comporta distinto al azar
+
+COST · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-13 11:30 → 2026-10-13 12:30
+Dirección acertada:   9 de 20 (45%)
+  Margen de error 95%: 26% a 66%
+  El precio subió en 11 de 20 ventanas; siempre apostar a la más frecuente acertaría 55%
+Error abs. medio:     14.48
+Baseline "se queda igual": 9.62
+Le gana al baseline:  5 de 20 ventanas
+Desfase absoluto medio: 6.7 velas (sin importar el signo)
+  Signo medio: 0.1   mediana: -1.5
+  Tarde: 9   Adelantado: 10   Sin desfase: 1
+  Error alineando por desfase: 11.08 (contra 14.48 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+COST · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 6.7 | adelantado 50% | tarde 45% | sin desfase 5% | en el borde 50%
+  Pares sin relación ( 380): abs 6.6 | adelantado 52% | tarde 46% | sin desfase 3% | en el borde 63%
+  → parecidos: el desfase medido es probablemente un artefacto de la medida
+
+SPY · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-13 09:30 → 2026-10-13 12:30
+Dirección acertada:   11 de 20 (55%)
+  Margen de error 95%: 34% a 74%
+  El precio subió en 9 de 20 ventanas; siempre apostar a la más frecuente acertaría 55%
+Error abs. medio:     8.74
+Baseline "se queda igual": 4.81
+Le gana al baseline:  3 de 20 ventanas
+Desfase absoluto medio: 6.2 velas (sin importar el signo)
+  Signo medio: -1.1   mediana: -2.5
+  Tarde: 7   Adelantado: 10   Sin desfase: 3
+  Error alineando por desfase: 6.85 (contra 8.74 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+SPY · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 6.2 | adelantado 50% | tarde 35% | sin desfase 15% | en el borde 60%
+  Pares sin relación ( 380): abs 6.3 | adelantado 62% | tarde 32% | sin desfase 7% | en el borde 61%
+  → distintos: el emparejamiento correcto se comporta distinto al azar
+
+QQQ · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-10 12:30 → 2026-10-13 12:30
+Dirección acertada:   15 de 20 (75%)
+  Margen de error 95%: 53% a 89%
+  El precio subió en 8 de 20 ventanas; siempre apostar a la más frecuente acertaría 60%
+Error abs. medio:     11.37
+Baseline "se queda igual": 9.12
+Le gana al baseline:  10 de 20 ventanas
+Desfase absoluto medio: 4.8 velas (sin importar el signo)
+  Signo medio: -1.4   mediana: -2.5
+  Tarde: 6   Adelantado: 12   Sin desfase: 2
+  Error alineando por desfase: 9.18 (contra 11.37 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+QQQ · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 4.8 | adelantado 60% | tarde 30% | sin desfase 10% | en el borde 35%
+  Pares sin relación ( 380): abs 6.3 | adelantado 53% | tarde 41% | sin desfase 6% | en el borde 58%
+  → distintos: el emparejamiento correcto se comporta distinto al azar
+
+PLTR · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-07-13 11:30 → 2026-10-13 12:30
+Dirección acertada:   10 de 20 (50%)
+  Margen de error 95%: 30% a 70%
+  El precio subió en 12 de 20 ventanas; siempre apostar a la más frecuente acertaría 60%
+Error abs. medio:     11.01
+Baseline "se queda igual": 5.58
+Le gana al baseline:  4 de 20 ventanas
+Desfase absoluto medio: 7.5 velas (sin importar el signo)
+  Signo medio: -4.5   mediana: -8
+  Tarde: 5   Adelantado: 15   Sin desfase: 0
+  Error alineando por desfase: 7.49 (contra 11.01 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+PLTR · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 7.5 | adelantado 75% | tarde 25% | sin desfase 0% | en el borde 80%
+  Pares sin relación ( 380): abs 7.0 | adelantado 68% | tarde 29% | sin desfase 2% | en el borde 72%
+  → parecidos: el desfase medido es probablemente un artefacto de la medida
+
+BTCUSDT · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-09-29 03:00 → 2026-10-18 03:00
+Dirección acertada:   14 de 20 (70%)
+  Margen de error 95%: 48% a 85%
+  El precio subió en 12 de 20 ventanas; siempre apostar a la más frecuente acertaría 60%
+Error abs. medio:     613.11
+Baseline "se queda igual": 551.22
+Le gana al baseline:  8 de 20 ventanas
+Desfase absoluto medio: 5.8 velas (sin importar el signo)
+  Signo medio: -0.1   mediana: -2.5
+  Tarde: 8   Adelantado: 11   Sin desfase: 1
+  Error alineando por desfase: 453.62 (contra 613.11 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+BTCUSDT · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 5.8 | adelantado 55% | tarde 40% | sin desfase 5% | en el borde 50%
+  Pares sin relación ( 380): abs 6.2 | adelantado 42% | tarde 54% | sin desfase 4% | en el borde 54%
+  → distintos: el emparejamiento correcto se comporta distinto al azar
+
+ETHUSDT · 1h · 20 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2026-09-29 03:00 → 2026-10-18 03:00
+Dirección acertada:   6 de 20 (30%)
+  Margen de error 95%: 15% a 52%
+  El precio subió en 9 de 20 ventanas; siempre apostar a la más frecuente acertaría 55%
+Error abs. medio:     40.20
+Baseline "se queda igual": 24.07
+Le gana al baseline:  3 de 20 ventanas
+Desfase absoluto medio: 6.0 velas (sin importar el signo)
+  Signo medio: -1.4   mediana: -2.5
+  Tarde: 8   Adelantado: 11   Sin desfase: 1
+  Error alineando por desfase: 31.60 (contra 40.20 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+ETHUSDT · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    (  20): abs 6.0 | adelantado 55% | tarde 40% | sin desfase 5% | en el borde 55%
+  Pares sin relación ( 380): abs 6.6 | adelantado 54% | tarde 43% | sin desfase 3% | en el borde 66%
+  → parecidos: el desfase medido es probablemente un artefacto de la medida
+
+ticker   aciertos  %    IC95    base  err medio  baseline  gana base.  desf. abs  tarde/adel.
+-------  --------  ---  ------  ----  ---------  --------  ----------  ---------  -----------
+KO       9/20      45%  26-66%  60%   2.08       1.11      2/20        6.6        9/10       
+TLT      7/20      35%  18-57%  60%   1.03       0.48      2/20        7.3        6/14       
+MCD      8/20      40%  22-61%  55%   6.10       2.75      3/20        6.2        6/11       
+COST     9/20      45%  26-66%  55%   14.48      9.62      5/20        6.7        9/10       
+SPY      11/20     55%  34-74%  55%   8.74       4.81      3/20        6.2        7/10       
+QQQ      15/20     75%  53-89%  60%   11.37      9.12      10/20       4.8        6/12       
+PLTR     10/20     50%  30-70%  60%   11.01      5.58      4/20        7.5        5/15       
+BTCUSDT  14/20     70%  48-85%  60%   613.11     551.22    8/20        5.8        8/11       
+ETHUSDT  6/20      30%  15-52%  55%   40.20      24.07     3/20        6.0        8/11       

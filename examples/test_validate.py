@@ -28,6 +28,14 @@ def test_best_lag_short_path():
     assert k == 0 and err == 1.0
 
 
+def test_best_lag_corr():
+    steps = np.random.default_rng(5).normal(size=40)
+    truth = 100 + np.cumsum(steps)
+    for k in (3, -3, 6, 0):
+        got, c, _ = v.best_lag_corr(shifted(truth, k), truth, 100.0, max_shift=8)
+        assert got == k and c > 0.8, (k, got, c)
+
+
 def test_wilson():
     lo, hi = v.wilson_interval(8, 20)
     assert round(lo * 100) == 22 and round(hi * 100) == 61, (lo, hi)

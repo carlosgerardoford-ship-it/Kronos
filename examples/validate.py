@@ -117,6 +117,25 @@ def best_lag(pred, truth, last, max_shift):
     return best_k, best_err
 
 
+def best_lag_corr(pred, truth, last, max_shift):
+    """Lag by correlation of candle-to-candle changes (no edge pile-up, unlike best_lag).
+
+    Returns (best_k, corr at best_k, corr at 0); k > 0: the prediction arrives late. The search range
+    should stay well under the path length so the overlap is never tiny (e.g. pred_len // 4).
+    """
+    a = np.diff(np.concatenate([[last], pred]))
+    b = np.diff(np.concatenate([[last], truth]))
+    n, corr = len(a), {}
+    for k in range(-max_shift, max_shift + 1):
+        x, y = (a[k:], b[:n - k]) if k >= 0 else (a[:n + k], b[-k:])
+        if len(x) >= 3 and x.std() > 0 and y.std() > 0:
+            corr[k] = float(np.corrcoef(x, y)[0, 1])
+    if not corr:
+        return 0, float("nan"), float("nan")
+    best = max(sorted(corr, key=abs), key=lambda k: corr[k])
+    return best, corr[best], corr.get(0, float("nan"))
+
+
 def wilson_interval(hits, n, z=1.96):
     p = hits / n
     den = 1 + z * z / n

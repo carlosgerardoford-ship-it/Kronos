@@ -1,0 +1,10 @@
+Desfase por correlación de cambios (±6 velas). Formato: pares correctos vs pares sin relación
+BTCUSDT  corr@0 -0.020 vs -0.021 | desfase abs 4.0 vs 3.5 | adelantado 45% vs 43% | borde 15% vs 17%
+COST     corr@0 +0.090 vs +0.002 | desfase abs 3.1 vs 3.4 | adelantado 50% vs 44% | borde 10% vs 18%
+ETHUSDT  corr@0 -0.063 vs -0.020 | desfase abs 3.1 vs 3.5 | adelantado 60% vs 44% | borde 10% vs 18%
+KO       corr@0 -0.009 vs +0.018 | desfase abs 3.0 vs 3.3 | adelantado 40% vs 47% | borde 25% vs 17%
+MCD      corr@0 +0.121 vs -0.006 | desfase abs 2.5 vs 3.5 | adelantado 50% vs 52% | borde 20% vs 18%
+PLTR     corr@0 +0.006 vs -0.012 | desfase abs 2.5 vs 3.6 | adelantado 35% vs 51% | borde 10% vs 18%
+QQQ      corr@0 +0.055 vs +0.005 | desfase abs 1.7 vs 3.2 | adelantado 40% vs 47% | borde 5% vs 14%
+SPY      corr@0 -0.087 vs -0.008 | desfase abs 4.5 vs 3.4 | adelantado 45% vs 44% | borde 20% vs 19%
+TLT      corr@0 +0.014 vs +0.005 | desfase abs 3.0 vs 3.5 | adelantado 40% vs 41% | borde 30% vs 21%
