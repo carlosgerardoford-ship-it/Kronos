@@ -1,0 +1,3 @@
+Desfase por correlación de cambios (±30 velas). Formato: pares correctos vs pares sin relación
+BTCUSDT  corr@0 -0.018 vs +0.001 | desfase abs 17.8 vs 17.4 | adelantado 60% vs 49% | borde 6% vs 5%
+QQQ      corr@0 +0.061 vs +0.002 | desfase abs 11.3 vs 16.7 | adelantado 29% vs 51% | borde 6% vs 4%

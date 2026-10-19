@@ -1,0 +1,28 @@
+BTCUSDT · 5m · 100 ventanas
+Cada una predice 120 velas, con 1 muestra(s)
+Período: 2026-09-08 03:20 → 2026-10-19 09:20
+Dirección acertada:   48 de 100 (48%)
+  Margen de error 95%: 38% a 58%
+  El precio subió en 53 de 100 ventanas; siempre apostar a la más frecuente acertaría 53%
+Error abs. medio:     876.67
+Baseline "se queda igual": 419.69
+Le gana al baseline:  19 de 100 ventanas
+Desfase absoluto medio: 34.0 velas (sin importar el signo)
+  Signo medio: -14.8   mediana: -39.5
+  Tarde: 31   Adelantado: 68   Sin desfase: 1
+  Error alineando por desfase: 673.76 (contra 876.67 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+BTCUSDT · volatilidad (100 ventanas; baseline = misma volatilidad que en el contexto)
+Rango (máx-mín) de la ventana
+  Correlación (Spearman) con el real:  modelo +0.24 | baseline +0.29
+  Error log mediano |ln(pred/real)|:   modelo 0.47 | baseline 0.47
+  Mediana predicho/real: 1.38
+Volatilidad (desv. de cambios de cierre)
+  Correlación (Spearman) con el real:  modelo +0.21 | baseline +0.34
+  Error log mediano |ln(pred/real)|:   modelo 0.45 | baseline 0.31
+  Mediana predicho/real: 0.87
+
+ticker   aciertos  %    IC95    base  err medio  baseline  gana base.  desf. abs  tarde/adel.
+-------  --------  ---  ------  ----  ---------  --------  ----------  ---------  -----------
+BTCUSDT  48/100    48%  38-58%  53%   876.67     419.69    19/100      34.0       31/68      

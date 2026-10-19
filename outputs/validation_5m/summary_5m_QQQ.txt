@@ -1,0 +1,28 @@
+QQQ · 5m · 35 ventanas
+Cada una predice 120 velas, con 1 muestra(s)
+Período: 2026-08-03 11:50 → 2026-10-16 12:25
+Dirección acertada:   21 de 35 (60%)
+  Margen de error 95%: 44% a 74%
+  El precio subió en 16 de 35 ventanas; siempre apostar a la más frecuente acertaría 54%
+Error abs. medio:     10.41
+Baseline "se queda igual": 4.75
+Le gana al baseline:  8 de 35 ventanas
+Desfase absoluto medio: 36.0 velas (sin importar el signo)
+  Signo medio: -14.1   mediana: -40
+  Tarde: 11   Adelantado: 24   Sin desfase: 0
+  Error alineando por desfase: 7.91 (contra 10.41 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+QQQ · volatilidad (35 ventanas; baseline = misma volatilidad que en el contexto)
+Rango (máx-mín) de la ventana
+  Correlación (Spearman) con el real:  modelo +0.02 | baseline +0.04
+  Error log mediano |ln(pred/real)|:   modelo 0.53 | baseline 0.35
+  Mediana predicho/real: 1.58
+Volatilidad (desv. de cambios de cierre)
+  Correlación (Spearman) con el real:  modelo +0.22 | baseline +0.03
+  Error log mediano |ln(pred/real)|:   modelo 0.44 | baseline 0.27
+  Mediana predicho/real: 0.67
+
+ticker  aciertos  %    IC95    base  err medio  baseline  gana base.  desf. abs  tarde/adel.
+------  --------  ---  ------  ----  ---------  --------  ----------  ---------  -----------
+QQQ     21/35     60%  44-74%  54%   10.41      4.75      8/35        36.0       11/24      
