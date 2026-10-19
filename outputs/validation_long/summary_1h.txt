@@ -1,0 +1,33 @@
+QQQ · 1h · 126 ventanas
+Cada una predice 24 velas, con 1 muestra(s)
+Período: 2025-01-17 11:30 → 2026-10-13 13:30
+Dirección acertada:   61 de 126 (48%)
+  Margen de error 95%: 40% a 57%
+  El precio subió en 79 de 126 ventanas; siempre apostar a la más frecuente acertaría 63%
+Error abs. medio:     13.86
+Baseline "se queda igual": 7.40
+Le gana al baseline:  27 de 126 ventanas
+Desfase absoluto medio: 6.7 velas (sin importar el signo)
+  Signo medio: -2.3   mediana: -6.5
+  Tarde: 41   Adelantado: 80   Sin desfase: 5
+  Error alineando por desfase: 10.32 (contra 13.86 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+QQQ · volatilidad (126 ventanas; baseline = misma volatilidad que en el contexto)
+Rango (máx-mín) de la ventana
+  Correlación (Spearman) con el real:  modelo +0.08 | baseline +0.41
+  Error log mediano |ln(pred/real)|:   modelo 0.41 | baseline 0.34
+  Mediana predicho/real: 1.39
+Volatilidad (desv. de cambios de cierre)
+  Correlación (Spearman) con el real:  modelo +0.11 | baseline +0.50
+  Error log mediano |ln(pred/real)|:   modelo 0.40 | baseline 0.31
+  Mediana predicho/real: 1.04
+
+QQQ · prueba sin habilidad (desfase máx. 8)
+  Pares correctos    ( 126): abs 6.7 | adelantado 63% | tarde 33% | sin desfase 4% | en el borde 62%
+  Pares sin relación (15750): abs 6.7 | adelantado 66% | tarde 31% | sin desfase 3% | en el borde 66%
+  → parecidos: el desfase medido es probablemente un artefacto de la medida
+
+ticker  aciertos  %    IC95    base  err medio  baseline  gana base.  desf. abs  tarde/adel.
+------  --------  ---  ------  ----  ---------  --------  ----------  ---------  -----------
+QQQ     61/126    48%  40-57%  63%   13.86      7.40      27/126      6.7        41/80      

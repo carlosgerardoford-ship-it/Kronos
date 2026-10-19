@@ -1,0 +1,54 @@
+BTCUSDT · 1h · 60 ventanas
+Cada una predice 24 velas, con 5 muestra(s)
+Período: 2026-08-20 14:00 → 2026-10-18 14:00
+Dirección acertada:   32 de 60 (53%)
+  Margen de error 95%: 41% a 65%
+  El precio subió en 30 de 60 ventanas; siempre apostar a la más frecuente acertaría 50%
+Error abs. medio:     1226.35
+Baseline "se queda igual": 644.58
+Le gana al baseline:  21 de 60 ventanas
+Desfase absoluto medio: 6.8 velas (sin importar el signo)
+  Signo medio: 0.2   mediana: 1.5
+  Tarde: 30   Adelantado: 29   Sin desfase: 1
+  Error alineando por desfase: 841.67 (contra 1226.35 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+BTCUSDT · volatilidad (60 ventanas; baseline = misma volatilidad que en el contexto)
+Rango (máx-mín) de la ventana
+  Correlación (Spearman) con el real:  modelo +0.33 | baseline +0.17
+  Error log mediano |ln(pred/real)|:   modelo 0.54 | baseline 0.51
+  Mediana predicho/real: 0.83
+Volatilidad (desv. de cambios de cierre)
+  Correlación (Spearman) con el real:  modelo +0.29 | baseline +0.07
+  Error log mediano |ln(pred/real)|:   modelo 0.89 | baseline 0.39
+  Mediana predicho/real: 0.41
+
+QQQ · 1h · 60 ventanas
+Cada una predice 24 velas, con 5 muestra(s)
+Período: 2025-12-15 14:30 → 2026-10-13 14:30
+Dirección acertada:   30 de 60 (50%)
+  Margen de error 95%: 38% a 62%
+  El precio subió en 34 de 60 ventanas; siempre apostar a la más frecuente acertaría 57%
+Error abs. medio:     13.48
+Baseline "se queda igual": 8.35
+Le gana al baseline:  21 de 60 ventanas
+Desfase absoluto medio: 6.2 velas (sin importar el signo)
+  Signo medio: -0.6   mediana: 0
+  Tarde: 24   Adelantado: 27   Sin desfase: 9
+  Error alineando por desfase: 10.05 (contra 13.48 sin alinear)
+  (+ = la predicción llega tarde; - = se adelanta)
+
+QQQ · volatilidad (60 ventanas; baseline = misma volatilidad que en el contexto)
+Rango (máx-mín) de la ventana
+  Correlación (Spearman) con el real:  modelo +0.10 | baseline +0.29
+  Error log mediano |ln(pred/real)|:   modelo 0.53 | baseline 0.31
+  Mediana predicho/real: 1.01
+Volatilidad (desv. de cambios de cierre)
+  Correlación (Spearman) con el real:  modelo +0.16 | baseline +0.31
+  Error log mediano |ln(pred/real)|:   modelo 0.71 | baseline 0.29
+  Mediana predicho/real: 0.51
+
+ticker   aciertos  %    IC95    base  err medio  baseline  gana base.  desf. abs  tarde/adel.
+-------  --------  ---  ------  ----  ---------  --------  ----------  ---------  -----------
+BTCUSDT  32/60     53%  41-65%  50%   1226.35    644.58    21/60       6.8        30/29      
+QQQ      30/60     50%  38-62%  57%   13.48      8.35      21/60       6.2        24/27      
