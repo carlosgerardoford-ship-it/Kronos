@@ -1,4 +1,4 @@
-# Criterios fijados antes de correr (5m)
+# Criterios fijados antes de correr (5m, backtest walk-forward)
 Configuración: Kronos-small, 5m, lookback 400, pred-len 120 (la del ejemplo oficial del repo), 1 muestra. Activos: BTCUSDT (100 ventanas) y QQQ (35, máximo disponible en Yahoo para 5m).
 Mismos criterios que en outputs/validation_long/PREREGISTRO.md:
 Dirección: pasa si (a) le gana al baseline "se queda igual" en más de la mitad de las ventanas y (b) su % de aciertos supera la base de apostar siempre al lado más frecuente, con el límite inferior del IC95% (Wilson) por encima de 50%.
