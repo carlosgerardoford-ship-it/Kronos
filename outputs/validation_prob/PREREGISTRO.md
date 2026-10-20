@@ -46,3 +46,7 @@ Pasa solo si se cumplen (a) Y (b). Si no pasa, no se prueban otros activos ni te
 
 ## Salidas
 `outputs/validation_prob/`: `BTCUSDT_1h_prob.csv` (una fila por ventana, con checkpoint), `samples_BTCUSDT_1h.npz` (trayectorias de Kronos, con checkpoint incremental y posibilidad de reanudar), `summary_prob.txt` (tabla, tests y veredicto contra este prerregistro), `pit_hist.png`, `coverage.png`. El informe final: `INFORME_PROB_KRONOS.txt`.
+
+## Adenda (2026-10-20, escrita antes de correr el modelo; detalle de implementación, no cambia los criterios)
+Los tests sin modelo mostraron que el cuantil "lineal" por defecto de numpy, con 25 muestras, da intervalos que cubren ~83% cuando el nominal es 90% (~74% para 80%, ~46% para 50%) incluso con un pronóstico perfectamente calibrado, y Kupiec lo rechazaría. Por eso los cuantiles empíricos (intervalos 50/80/90% y VaR/ES) se calculan con el estimador de Weibull (posición q·(m+1)), que da cobertura exacta bajo intercambiabilidad; queda un residuo de ~+1 punto de sobrecobertura en el 90% por interpolar en las colas. Se usa el mismo estimador para Kronos y para los baselines. Los criterios (a) y (b) y sus umbrales no cambian.
+Además, la simulación de GARCH usa el generador `rng` de `arch` (su parámetro `random_state` se ignora), para que sea reproducible con la misma semilla.
