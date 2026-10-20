@@ -18,8 +18,11 @@ El plan original usaba 50 muestras por ventana. Se midió el tiempo con 3 ventan
 Los retornos del contexto son los 399 log-retornos horarios de las 400 velas.
 1. Paseo aleatorio normal: media 0, desvío = desvío muestral (ddof=1) de los retornos del contexto.
 2. Paseo aleatorio t de Student: media 0; grados de libertad y escala por máxima verosimilitud sobre los retornos del contexto (scipy.stats.t.fit con loc=0); gl acotados a [2.1, 100].
-3. Bootstrap por bloques: cada trayectoria es un bloque de 24 retornos consecutivos del contexto, con inicio uniforme entre las 376 posiciones posibles (bloque configurable).
-4. GARCH(1,1): paquete `arch`, media cero, innovaciones normales, ajustado sobre los retornos del contexto (en %), simulación hacia adelante de 24 pasos con 1000 simulaciones. Si el ajuste falla, la ventana usa el paseo normal y se registra cuántas ventanas ocurrió.
+3. Bootstrap por bloques: cada trayectoria es un bloque de 24 retornos consecutivos del contexto, con inicio uniforme entre las 376 posiciones posibles (bloque configurable). Con un bloque de 24 y pred_len 24, equivale a una **simulación histórica de trayectorias de 24 h tomadas del contexto**.
+4. GARCH(1,1): paquete `arch`, media cero, innovaciones normales, ajustado sobre los retornos del contexto (en %), simulación hacia adelante de 24 pasos con 1000 simulaciones. Si el ajuste falla (o no converge), la ventana usa el paseo normal como respaldo, y **el resumen reporta cuántas ventanas de GARCH usaron ese respaldo**.
+
+## Dependencias
+Además de `requirements.txt`: `arch` y `scipy` (versiones usadas: arch 8.0.0, scipy 1.18.1), listadas en `examples/requirements_prob.txt` (`pip install -r examples/requirements_prob.txt`).
 
 ## Estimador de CRPS (igual para el modelo y los baselines)
 CRPS "justo" con corrección de muestra finita: CRPS = (1/m)·Σ|x_i − y| − (1/(2·m·(m−1)))·Σ_i Σ_j |x_i − x_j|, con m = 25 para Kronos y m = 1000 para cada baseline. El mismo estimador se usa para el cierre final y para los horizontes 1, 6, 12 y 24. El energy score de la trayectoria usa el análogo justo con la norma euclídea.
