@@ -71,6 +71,49 @@ def test_central_interval_has_exact_coverage_with_25_samples():
         assert lin < lv / 100 - 0.02                                        # numpy's default would undercover
 
 
+def test_perfect_forecast_rejection_rates_with_25_samples():
+    """Perfect forecast, 25 samples, 100 windows, repeated: KS (randomised PIT) and Kupiec should reject ~5%."""
+    R, n, m = 1000, 100, 25
+    rng = np.random.default_rng(321)
+    rej_ks = rej_ks_plain = joint_pass = 0
+    rej_k = {50: 0, 80: 0, 90: 0}
+    for _ in range(R):
+        X, y = rng.normal(size=(n, m)), rng.normal(size=n)
+        pit = np.array([vp.pit_value(X[i], y[i], rng.uniform()) for i in range(n)])
+        p_ks = stats.kstest(pit, "uniform").pvalue
+        rej_ks += p_ks < 0.05
+        rej_ks_plain += stats.kstest((X < y[:, None]).sum(axis=1) / m, "uniform").pvalue < 0.05
+        ok = p_ks > 0.05
+        for lv in rej_k:
+            fails = sum(not (lo <= y[i] <= hi) for i in range(n) for lo, hi in [vp.central_interval(X[i], lv)])
+            p = vp.kupiec_pof(fails, n, 1 - lv / 100)[1]
+            rej_k[lv] += p < 0.05
+            ok &= p > 0.05
+        joint_pass += ok
+    assert 0.02 <= rej_ks / R <= 0.08, rej_ks / R                       # randomised PIT: close to the nominal 5%
+    assert rej_ks_plain / R > rej_ks / R                                 # the discrete PIT would reject more often
+    assert all(0.02 <= v / R <= 0.09 for v in rej_k.values()), rej_k    # Kupiec at 50/80/90%
+    assert 0.78 <= joint_pass / R <= 0.90, joint_pass / R               # a perfect forecast passes (b) ~84% of the time
+
+
+def test_baselines_use_same_pit_and_quantiles_as_kronos():
+    rng = np.random.default_rng(9)
+    X = np.cumsum(rng.normal(0, 0.004, (1000, 24)), axis=1)
+    y = np.cumsum(rng.normal(0, 0.004, 24))
+    row = vp.window_row(0, "t", 100.0, y, {"kronos": X[:25], "normal": X[:25], "student": X}, np.random.default_rng(1))
+    for lv in vp.LEVELS:                                                 # same Weibull intervals for any model name / size
+        assert row["kronos_width%d" % lv] == row["normal_width%d" % lv]
+        lo, hi = np.quantile(X[:25, -1], [(1 - lv / 100) / 2, 1 - (1 - lv / 100) / 2], method="weibull")
+        assert abs(row["kronos_width%d" % lv] - (hi - lo)) < 1e-12
+    assert row["kronos_var5"] == row["normal_var5"]
+    for m, size in (("kronos", 25), ("normal", 25), ("student", 1000)):  # randomised PIT = (rank + U) / (m + 1)
+        rank = int((X[:size, -1] < y[-1]).sum())
+        assert rank / (size + 1) <= row[f"{m}_pit"] < (rank + 1) / (size + 1)
+    r1 = vp.compute_window(make_df(1, 60, 24), 0, 60, 24, stub_sampler(), 100, 24, 0)[0]
+    r2 = vp.compute_window(make_df(1, 60, 24), 0, 60, 24, stub_sampler(), 100, 24, 0)[0]
+    assert all(r1[f"{m}_pit"] == r2[f"{m}_pit"] for m in vp.MODELS)     # fixed seed -> reproducible PIT
+
+
 def test_kupiec_known_values():
     lr, p = vp.kupiec_pof(10, 100, 0.05)
     expect = -2 * ((90 * np.log(0.95) + 10 * np.log(0.05)) - (90 * np.log(0.9) + 10 * np.log(0.1)))
